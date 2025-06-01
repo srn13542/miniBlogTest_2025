@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import "../css/PostList.css";
 
 function PostList() {
     const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);  // 로딩 상태 추가
-    const [error, setError] = useState(null);      // 에러 상태 추가
+    const [loading, setLoading] = useState(true);  // 로딩 상태 
+    const [error, setError] = useState(null);      // 에러 상태 
 
     useEffect(() => {
         fetch("http://localhost:8080/api/posts")
@@ -23,17 +25,26 @@ function PostList() {
         });
     }, []);
 
-    if (loading) return <p>로딩중 ... </p>;
-    if (error) return <p>에러 발생: {error}</p>;
+    if (loading) return <p id="loading">로딩중 ... </p>;
+    if (error) return <p id ="error">에러 발생: {error}</p>;
 
     return (
-        <div style={{ padding: "2rem" }}>
+        <div class ="outlineBox" style={{ padding: "2rem" }}>
             {posts.map(post => (
-                <div key={post.id} style={{ marginBottom: "1.5rem" }}>
-                    <h2>{post.title}</h2>
-                    <p>{post.content}</p>
-                    <small>{post.createdAt ? new Date(post.createdAt).toLocaleString() : ''}</small>
-                </div>
+                <Link
+                    to = {`/post/${post.id}`}
+                    key = {post.id}
+                    className = "inlineBox"
+                    style = {{
+                        marginBottom: "1.5rem",
+                        display: "block",
+                        textDecoration: "none",
+                        color: "inherit"
+                    }}>
+                    <h2 className = "postTitle">{post.title}</h2>
+                    <p className = "postContent">{post.content}</p>
+                    <small className = "postDate">{post.createdAt ? new Date(post.createdAt).toLocaleString() : ''}</small>
+                </Link>
             ))}
         </div>
     );

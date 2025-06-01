@@ -1,12 +1,19 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PostList from './components/PostList';
+import Post from './components/Post';
 
 function App() {
   return (
-    <div>
-      <h1>📘 My Blog</h1>
-      <PostList />
-    </div>
+    <Router>
+      <div>
+        <h1>📘 My Blog</h1>
+        <Routes>
+          <Route path="/" element={<PostList />} />
+          <Route path="/post/:id" element={<Post />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
