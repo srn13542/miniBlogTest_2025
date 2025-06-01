@@ -1,36 +1,47 @@
 package srn.golem.blog_backend.controller;
 
-import java.time.LocalDateTime;
-import java.util.List;
 
+import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.RequiredArgsConstructor;
+import srn.golem.blog_backend.domain.PostDTO;
 import srn.golem.blog_backend.entity.Post;
-import srn.golem.blog_backend.repository.PostRepository;
+import srn.golem.blog_backend.service.PostService;
 
 @RestController
 @RequestMapping("/api/posts")
 @CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class PostController {
-    private final PostRepository postRepository;
+    private final PostService postService;
 
-    public PostController(PostRepository postRepository) {
-        this.postRepository = postRepository;
-    }
-
+    //게시글 목록 받아오기 위한 func, /api/posts
     @GetMapping
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public ResponseEntity<List<PostDTO>> getAllPosts() {
+        List<PostDTO> posts = postService.getAllPosts();
+        return ResponseEntity.ok(posts);
     }
 
+    //게시글 상세 위한 코드
+    @GetMapping("/{id}")
+    public ResponseEntity<PostDTO> getPostById(@PathVariable Long id) {
+        PostDTO post = postService.getPostById(id);
+        return ResponseEntity.ok(post);
+    }
+
+    //게시글 작성 위한 function, /api/posts
     @PostMapping
-    public Post createPost(@RequestBody Post post) {
-        post.setCreatedAt(LocalDateTime.now());
-        return postRepository.save(post);
+    public ResponseEntity<PostDTO> createPost(@RequestBody Post post) {
+        PostDTO createdPost = postService.createPost(post);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
     }
 }
