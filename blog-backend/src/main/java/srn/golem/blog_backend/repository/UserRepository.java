@@ -5,4 +5,5 @@ import srn.golem.blog_backend.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String userName);
+    User findByUsername(String userName);
 }

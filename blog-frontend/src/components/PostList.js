@@ -29,7 +29,7 @@ function PostList() {
     if (error) return <p id ="error">에러 발생: {error}</p>;
 
     return (
-        <div class ="outlineBox" style={{ padding: "2rem" }}>
+        <div className ="outlineBox" style={{ padding: "2rem" }}>
             {posts.map(post => (
                 <Link
                     to = {`/post/${post.id}`}
