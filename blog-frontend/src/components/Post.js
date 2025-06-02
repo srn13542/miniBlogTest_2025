@@ -9,6 +9,7 @@ function Post() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const [comment, setComment] = useState(""); // 댓글 입력 필드 상태
 
     useEffect(() => {
         fetch(`http://localhost:8080/api/posts/${id}`)
@@ -41,6 +42,17 @@ function Post() {
             </small>
             <div style={{ marginTop: "1rem" }}>
                 <button onClick={() => navigate(-1)}>뒤로가기</button>
+            </div>
+
+             {/* 댓글 작성 UI */}
+            <div className="commentBox">
+                <h3>댓글 작성</h3>
+                <textarea
+                    className="commentInput"
+                    placeholder="댓글을 입력하세요..."
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)} />
+                <button style={{ marginTop: "0.5rem" }}>댓글 작성</button>
             </div>
         </div>
     );
