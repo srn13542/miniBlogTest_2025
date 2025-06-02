@@ -24,6 +24,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 필요에 따라 OPTIONS 요청 허용
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   //Get 요청 허용
+                .requestMatchers(HttpMethod.DELETE, "/api/posts/{postId}/comments/{commentId}").permitAll() // DELETE 요청 허용
                 .requestMatchers("/api/users/**").permitAll()      // 회원가입, 로그인 등 허용
                 .requestMatchers("/api/posts/**").permitAll()      // 게시글 관련 API 모두 허용
                 .requestMatchers("/api/comments/**").permitAll() // 댓글 관련 API는 인증 필요

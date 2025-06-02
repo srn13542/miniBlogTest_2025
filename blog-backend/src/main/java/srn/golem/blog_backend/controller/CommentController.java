@@ -54,6 +54,7 @@ public class CommentController {
 
     //댓글 삭제
     @DeleteMapping("/{postId}/comments/{commentId}")
+    @CrossOrigin(origins = "http://localhost:3000") // CORS 허용
     public ResponseEntity<Void> deleteComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId) {
         //postId는 선택적 검증을 위해 사용할 수 있다?
         commentService.deleteComment(commentId);

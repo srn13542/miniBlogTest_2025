@@ -95,12 +95,15 @@ function Post() {
 
     //댓글 삭제 API 요청 함수
     const handleCommentDelete = (commentId) => {
-        fetch(`http://localhost:8080/api/comments/${commentId}`, {
-            method: "DELETE"
+        fetch(`http://localhost:8080/api/posts/${post.id}/comments/${commentId}`, {
+            method: "DELETE",
+            header: {
+                "Content-Type" : "application/json"
+            }
         })
         .then(response => {
             if(!response.ok) throw new Error("댓글 삭제에 실패했습니다.");
-            return response.json();
+            return response.text().then(text => text ? JSON.parse(text): {});
         })
         .then(() => {
             alert("댓글이 삭제되었습니다.");
