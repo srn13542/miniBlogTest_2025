@@ -1,6 +1,7 @@
 package srn.golem.blog_backend.service;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import srn.golem.blog_backend.domain.PostDTO;
 import srn.golem.blog_backend.entity.Post;
@@ -33,7 +35,7 @@ public class PostService {
     public PostDTO getPostById(Long id) {
         return postRepository.findById(id)
                 .map(PostDTO::new)
-                .orElseThrow(() -> new RuntimeException("Post not Found"));
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
     }
 
     //오류 방지 위해 null 시 default로... 실제 앱에서는 로그인된 사용자로 대체해야 한다고 함
@@ -50,5 +52,28 @@ public class PostService {
     public void register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
+    }
+
+    //게시글 수정 메소드
+    @Transactional
+    public PostDTO updatePost(Long id, Post updatedPost) {
+        Post existingPost = postRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+        //필요한 필드 업데이트
+        existingPost.setTitle(updatedPost.getTitle());
+        existingPost.setContent(updatedPost.getContent());
+
+        //updateAt같은 필드 업데이트.. 
+        existingPost.setUpdatedAt(LocalDateTime.now());
+        Post savedPost = postRepository.save(existingPost);
+        return new PostDTO(savedPost);
+    }
+
+    //게시글 삭제 메소드
+    public void deletePost(Long id) {
+        if(!postRepository.existsById(id)) {
+            throw new RuntimeException("삭제하려는 게시글이 존재하지 않습니다.");
+        }
+        postRepository.deleteById(id);
     }
 }

@@ -151,23 +151,23 @@ function Post() {
                 {post.createdAt ? new Date(post.createdAt).toLocaleString() : ''}
             </small>
             <div style={{ marginTop: "1rem" }}>
-                <button onClick={() => navigate(-1)}>뒤로가기</button>
+                <button className = "backStepButton" onClick={() => navigate(-1)}>뒤로가기</button>
             </div>
 
-             {/* 댓글 작성 UI */}
-            <div className="commentBox">
-                <h3>댓글 작성</h3>
-                <textarea
-                    className="commentInput"
-                    placeholder="댓글을 입력하세요..."
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)} />
-                <button style={{ marginTop: "0.5rem" }} onClick={handleCommentSubmit}>댓글 작성</button>
-            </div>
 
             {/*댓글 목록 UI*/}
             <div className = "commentList" style={{marginTop: "2rem"}}>
                 <h3>댓글 목록</h3>
+                {/* 댓글 작성 UI */}
+                <div className="commentBox">
+                    <h2>댓글 작성</h2>
+                    <textarea
+                        className="commentInput"
+                        placeholder="댓글을 입력하세요..."
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)} />
+                    <button style={{ marginTop: "0.5rem" }} onClick={handleCommentSubmit}>댓글 작성</button>
+                </div>
                 {comments.length === 0 ? (
                     <p>댓글이 없습니다.</p>
                 ) : (
@@ -176,18 +176,18 @@ function Post() {
                             {editingCommentId === c.id ? (
                                 <>
                                     <textarea value = {editingText} onChange={(e) => setEditingText(e.target.value)} style = {{ width: "100%", marginBottom: "0.5rem" }} />
-                                    <button onClick = {() => handleCommentUpdate(c.id)}>저장</button>
-                                    <button onClick = {() => {setEditingCommentId(null); setEditingText(""); }}>취소</button>
+                                    <button className = "commentButton" onClick = {() => handleCommentUpdate(c.id)}>저장</button>
+                                    <button className = "commentButton" onClick = {() => {setEditingCommentId(null); setEditingText(""); }}>취소</button>
                                 </>
                             ) : (
                                 <>
                                     <p>{c.content}</p>
-                                    <small>
+                                    <small className = "commentEditorText">
                                         작성자: {c.username} | {c.createdAt ? new Date(c.createdAt).toLocaleString() : '' }
                                     </small>
                                     <br />
-                                    <button onClick = {() => { setEditingCommentId(c.id); setEditingText(c.content); }}>수정</button>
-                                    <button onClick = {() => handleCommentDelete(c.id)}>삭제</button>
+                                    <button className = "commentButton" onClick = {() => { setEditingCommentId(c.id); setEditingText(c.content); }}>수정</button>
+                                    <button classNAme = "commentButton" onClick = {() => handleCommentDelete(c.id)}>삭제</button>
                                 </>
                             )}
                         </div>
