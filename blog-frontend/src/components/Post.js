@@ -84,7 +84,6 @@ function Post() {
             return response.json();
         })
         .then(data => {
-            alert("댓글 작성 성공!");
             setCommentText("");  //입력창 초기화
             fetchComments(); //댓글 목록을 상태에 반영하거나 새로 고침 처리
         })
@@ -95,6 +94,9 @@ function Post() {
 
     //댓글 삭제 API 요청 함수
     const handleCommentDelete = (commentId) => {
+
+        if (!window.confirm("정말로 댓글을 삭제하시겠습니까?")) return;
+
         fetch(`http://localhost:8080/api/posts/${post.id}/comments/${commentId}`, {
             method: "DELETE",
             header: {
@@ -106,7 +108,6 @@ function Post() {
             return response.text().then(text => text ? JSON.parse(text): {});
         })
         .then(() => {
-            alert("댓글이 삭제되었습니다.");
             setComments(prevComments => prevComments.filter(c => c.id !== commentId));
         })
         .catch(error => {
@@ -139,61 +140,127 @@ function Post() {
         });
     };
 
-    if (loading) return <p id="loading">로딩중...</p>;
-    if (error) return <p id="error">에러 발생: {error}</p>;
-    if (!post) return <p>게시글을 찾을 수 없습니다.</p>;
+    if (loading) return <div className="loading-container"><p className="loading-text">로딩중...</p></div>;
+    if (error) return <div className="error-container"><p className="error-text">에러 발생: {error}</p></div>;
+    if (!post) return <div className="error-container"><p className="error-text">게시글을 찾을 수 없습니다.</p></div>;
+
 
     return (
-        <div className="postDetail" style={{ padding: "2rem" }}>
-            <h2 className="postTitle">{post.title}</h2>
-            <p className="postContent">{post.content}</p>
-            <small className="postDate">
-                {post.createdAt ? new Date(post.createdAt).toLocaleString() : ''}
-            </small>
-            <div style={{ marginTop: "1rem" }}>
-                <button className = "backStepButton" onClick={() => navigate(-1)}>뒤로가기</button>
+        <div className="post-detail-container">
+            {/* 게시글 헤더 */}
+            <div className="post-header">
+                <button className="back-button" onClick={() => navigate(-1)}>
+                    ← 목록으로
+                </button>
             </div>
 
+            {/* 게시글 내용 */}
+            <article className="post-article">
+                <header className="article-header">
+                    <h1 className="article-title">{post.title}</h1>
+                    <div className="article-meta">
+                        <span className="article-date">
+                            {post.createdAt ? new Date(post.createdAt).toLocaleDateString('ko-KR', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }) : ''}
+                        </span>
+                    </div>
+                </header>
+                <div className="article-content">
+                    <p>{post.content}</p>
+                </div>
+            </article>
 
-            {/*댓글 목록 UI*/}
-            <div className = "commentList" style={{marginTop: "2rem"}}>
-                <h3>댓글 목록</h3>
-                {/* 댓글 작성 UI */}
-                <div className="commentBox">
-                    <h2>댓글 작성</h2>
+            {/* 댓글 섹션 */}
+            <section className="comments-section">
+                <div className="comments-header">
+                    <h2 className="comments-title">댓글 {comments.length}개</h2>
+                </div>
+
+                {/* 댓글 작성 폼 */}
+                <div className="comment-form">
+                    <h3 className="form-title">댓글 작성</h3>
                     <textarea
-                        className="commentInput"
+                        className="comment-textarea"
                         placeholder="댓글을 입력하세요..."
                         value={commentText}
-                        onChange={(e) => setCommentText(e.target.value)} />
-                    <button style={{ marginTop: "0.5rem" }} onClick={handleCommentSubmit}>댓글 작성</button>
+                        onChange={(e) => setCommentText(e.target.value)}
+                        rows="4"
+                    />
+                    <button className="btn btn-primary comment-submit" onClick={handleCommentSubmit}>
+                        댓글 작성
+                    </button>
                 </div>
-                {comments.length === 0 ? (
-                    <p>댓글이 없습니다.</p>
-                ) : (
-                    comments.map(c => (
-                        <div key = {c.id} className = "commentItem" style = {{ padding: "1rem", borderBottom: "1px solid #ddd"}}>
-                            {editingCommentId === c.id ? (
-                                <>
-                                    <textarea value = {editingText} onChange={(e) => setEditingText(e.target.value)} style = {{ width: "100%", marginBottom: "0.5rem" }} />
-                                    <button className = "commentButton" onClick = {() => handleCommentUpdate(c.id)}>저장</button>
-                                    <button className = "commentButton" onClick = {() => {setEditingCommentId(null); setEditingText(""); }}>취소</button>
-                                </>
-                            ) : (
-                                <>
-                                    <p>{c.content}</p>
-                                    <small className = "commentEditorText">
-                                        작성자: {c.username} | {c.createdAt ? new Date(c.createdAt).toLocaleString() : '' }
-                                    </small>
-                                    <br />
-                                    <button className = "commentButton" onClick = {() => { setEditingCommentId(c.id); setEditingText(c.content); }}>수정</button>
-                                    <button classNAme = "commentButton" onClick = {() => handleCommentDelete(c.id)}>삭제</button>
-                                </>
-                            )}
+
+                {/* 댓글 목록 */}
+                <div className="comments-list">
+                    {comments.length === 0 ? (
+                        <div className="empty-comments">
+                            <p>아직 댓글이 없습니다.</p>
                         </div>
-                    ))
-                )}
-            </div>
+                    ) : (
+                        comments.map(comment => (
+                            <div key={comment.id} className="comment-item">
+                                {editingCommentId === comment.id ? (
+                                    <div className="comment-edit-mode">
+                                        <textarea 
+                                            className="comment-edit-textarea"
+                                            value={editingText} 
+                                            onChange={(e) => setEditingText(e.target.value)}
+                                            rows="3"
+                                        />
+                                        <div className="comment-edit-actions">
+                                            <button className="btn btn-success btn-sm" onClick={() => handleCommentUpdate(comment.id)}>
+                                                저장
+                                            </button>
+                                            <button className="btn btn-secondary btn-sm" onClick={() => {
+                                                setEditingCommentId(null); 
+                                                setEditingText("");
+                                            }}>
+                                                취소
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="comment-display">
+                                        <div className="comment-content">
+                                            <p>{comment.content}</p>
+                                        </div>
+                                        <div className="comment-meta">
+                                            <span className="comment-author">
+                                                작성자: {comment.username || '익명'}
+                                            </span>
+                                            <span className="comment-date">
+                                                {comment.createdAt ? new Date(comment.createdAt).toLocaleDateString('ko-KR', {
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                }) : ''}
+                                            </span>
+                                        </div>
+                                        <div className="comment-actions">
+                                            <button className="btn btn-edit btn-sm" onClick={() => { 
+                                                setEditingCommentId(comment.id); 
+                                                setEditingText(comment.content); 
+                                            }}>
+                                                수정
+                                            </button>
+                                            <button className="btn btn-delete btn-sm" onClick={() => handleCommentDelete(comment.id)}>
+                                                삭제
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ))
+                    )}
+                </div>
+            </section>
         </div>
     );
 }

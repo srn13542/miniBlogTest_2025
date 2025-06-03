@@ -119,6 +119,9 @@ function PostList() {
 
     //게시글 삭제 api 호출
     const handlePostDelete = (postId) => {
+
+        if (!window.confirm("정말로 삭제하시겠습니까?")) return;
+
         fetch(`http://localhost:8080/api/posts/${postId}`, {
             method: "DELETE"
         })
@@ -136,65 +139,105 @@ function PostList() {
     };
 
 
-    if (loading) return <p id="loading">로딩중 ... </p>;
-    if (error) return <p id ="error">에러 발생: {error}</p>;
+    if (loading) return <div className="loading-container"><p className="loading-text">로딩중...</p></div>;
+    if (error) return <div className="error-container"><p className="error-text">에러 발생: {error}</p></div>;
+
 
 
     return (
-        <div className ="postListContainer" style={{ padding: "2rem" }}>
-            <h2 className = "pageTitle" >게시글 목록</h2>
-            {/*새 글 작성 영역*/}
-            <div className = "newPostCard" style = {{ marginBottom: "2rem", border: "1px solid #ccc", padding: "1rem" }}>
-                <h3>새 글 작성</h3>
-                <input
-                    type = "text"
-                    placeholder = "제목을 입력하세요"
-                    value = {newPostTitle}
-                    onChange = {(e) => setNewPostTitle(e.target.value)} />
-                <textarea
-                    placeholder = "내용을 입력하세요"
-                    value = {newPostContent}
-                    onChange = {(e) => setNewPostContent(e.target.value)} />
-                <buttom onClick = {handlePostSubmit}> 게시글 작성 </buttom>
+        <div className="blog-container">
+            <div className="blog-header">
+                <h1 className="blog-title">My Blog</h1>
+                <p className="blog-subtitle">{/*쓸 말이 안 떠오름*/}</p>
+            </div>
+
+            {/* 새 글 작성 영역 */}
+            <div className="new-post-section">
+                <h2 className="section-title">새 글 작성</h2>
+                <div className="new-post-form">
+                    <input
+                        type="text"
+                        className="post-title-input"
+                        placeholder="제목을 입력하세요"
+                        value={newPostTitle}
+                        onChange={(e) => setNewPostTitle(e.target.value)}
+                    />
+                    <textarea
+                        className="post-content-input"
+                        placeholder="내용을 입력하세요"
+                        value={newPostContent}
+                        onChange={(e) => setNewPostContent(e.target.value)}
+                        rows="5"
+                    />
+                    <button className="btn btn-primary" onClick={handlePostSubmit}>
+                        게시글 작성
+                    </button>
+                </div>
             </div>
 
             {/* 게시글 목록 */}
-            <div className = "postsContainer">
-            {posts.map(post => (
-                <div key={post.id} className="postCard" style={{ border: "1px solid #ddd", padding: "1rem", marginBottom: "1rem" }}>
-                    {editingPostId === post.id ? (
-                        <>
-                        {/* 수정 모드 */}
-                            <input
-                                type = "text"
-                                value = {editedTitle}
-                                onChange = {(e) => setEditedTitle(e.target.value)}
-                                className = "editTitle" />
-                            <textarea 
-                                value={editedContent} 
-                                onChange={(e) => setEditedContent(e.target.value)}
-                                className = "editContent" />
-                            <div className = "editButtons">
-                                <button className = "btn btn-save" onClick={() => handlePostUpdate(post.id)}>저장</button>
-                                <button className = "btn btn-cancel" onClick={() => setEditingPostId(null)}>취소</button>
+            <div className="posts-section">
+                <h2 className="section-title">게시글 목록</h2>
+                {posts.length === 0 ? (
+                    <div className="empty-state">
+                        <p>아직 작성된 게시글이 없습니다.</p>
+                    </div>
+                ) : (
+                    <div className="posts-grid">
+                        {posts.map(post => (
+                            <div key={post.id} className="post-card">
+                                {editingPostId === post.id ? (
+                                    <div className="edit-mode">
+                                        <input
+                                            type="text"
+                                            className="edit-title-input"
+                                            value={editedTitle}
+                                            onChange={(e) => setEditedTitle(e.target.value)}
+                                        />
+                                        <textarea 
+                                            className="edit-content-input"
+                                            value={editedContent} 
+                                            onChange={(e) => setEditedContent(e.target.value)}
+                                            rows="4"
+                                        />
+                                        <div className="edit-actions">
+                                            <button className="btn btn-success" onClick={() => handlePostUpdate(post.id)}>
+                                                저장
+                                            </button>
+                                            <button className="btn btn-secondary" onClick={() => setEditingPostId(null)}>
+                                                취소
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="post-content">
+                                        <Link to={`/post/${post.id}`} className="post-link">
+                                            <h3 className="post-title">{post.title}</h3>
+                                            <p className="post-preview">{post.content}</p>
+                                            <div className="post-meta">
+                                                <span className="post-date">
+                                                    {post.createdAt ? new Date(post.createdAt).toLocaleDateString('ko-KR', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric'
+                                                    }) : ''}
+                                                </span>
+                                            </div>
+                                        </Link>
+                                        <div className="post-actions">
+                                            <button className="btn btn-edit" onClick={() => handlePostEdit(post)}>
+                                                수정
+                                            </button>
+                                            <button className="btn btn-delete" onClick={() => handlePostDelete(post.id)}>
+                                                삭제
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                        </>
-                    ) : (
-                         <>  {/* 일반 모드 */}
-                            <Link
-                                to={`/post/${post.id}`} className = "postLink" >
-                                <h2 className="postTitle">{post.title}</h2>
-                                <p className="postContent">{post.content}</p>
-                                <small className="postDate">{post.createdAt ? new Date(post.createdAt).toLocaleString() : ''}</small>
-                            </Link>
-                            <div className = "postButtons">
-                                <button className = "btn btn-edit" onClick={() => handlePostEdit(post)}>수정</button>
-                                <button className = "btn btn-delete" onClick={() => handlePostDelete(post.id)}>삭제</button>
-                            </div>
-                        </>
-                    )}
-                </div>
-            ))}
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
