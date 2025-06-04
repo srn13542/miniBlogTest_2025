@@ -1,4 +1,4 @@
-package srn.golem.github_blog;
+package srn.golem.blog_backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

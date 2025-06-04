@@ -36,7 +36,7 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdComment);
     }
 
-    // 추가: 댓글 조회, 수정, 삭제 엔드포인트 등
+    
     @GetMapping("/{postId}/comments")
     public ResponseEntity<List<CommentDTO>> getCommentsByPostId(@PathVariable("postId") Long postId) {
         List<CommentDTO> commentDTOs = commentService.getCommentsByPostId(postId);

@@ -35,7 +35,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-        // 비밀번호 암호화용 빈 등록
+    // 비밀번호 암호화용 빈 등록
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
